@@ -1,19 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { ChangeDetectorRef } from '@angular/core';
-
+import { Component, ViewChild, ElementRef,ChangeDetectorRef, Inject } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,HttpClientModule],
 })
 export class AppComponent {
-
-  constructor(private cdr: ChangeDetectorRef) { }
-
+  constructor(
+    private cdr: ChangeDetectorRef,
+    @Inject(HttpClient) private http: HttpClient,
+  ) {}
 
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
@@ -30,7 +30,6 @@ export class AppComponent {
   private maxCanvasWidth: number = 1200;
   private maxCanvasHeight: number = 1000;
   savedSelections: any[] = [];
-  
 
   ngAfterViewInit() {
     const canvasElement: HTMLCanvasElement = this.canvas.nativeElement;
@@ -64,13 +63,13 @@ export class AppComponent {
         this.canvas.nativeElement.width = this.maxCanvasWidth;
         this.canvas.nativeElement.height = Math.max(
           1,
-          this.maxCanvasWidth / aspectRatio
+          this.maxCanvasWidth / aspectRatio,
         );
       } else {
         this.canvas.nativeElement.height = this.maxCanvasHeight;
         this.canvas.nativeElement.width = Math.max(
           1,
-          this.maxCanvasHeight * aspectRatio
+          this.maxCanvasHeight * aspectRatio,
         );
       }
     }
@@ -129,7 +128,7 @@ export class AppComponent {
       this.canvas.nativeElement.width,
       this.canvas.nativeElement.height,
     );
-    this.ctx.strokeStyle = "#00ABEB";
+    this.ctx.strokeStyle = '#00ABEB';
     this.ctx.lineWidth = 2;
     this.ctx.strokeRect(
       this.selection.x,
@@ -138,7 +137,6 @@ export class AppComponent {
       this.selection.height,
     );
     this.ctx.setLineDash([4, 2]);
-
   }
 
   addSavedSelection(url: string) {
@@ -150,15 +148,15 @@ export class AppComponent {
   saveSelection() {
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d')!;
-  
+
     const x = Math.min(this.startX, this.startX + this.selection.width);
     const y = Math.min(this.startY, this.startY + this.selection.height);
     const width = Math.abs(this.selection.width);
     const height = Math.abs(this.selection.height);
-  
+
     tempCanvas.width = width;
     tempCanvas.height = height;
-  
+
     tempCtx.drawImage(
       this.canvas.nativeElement,
       x,
@@ -168,32 +166,47 @@ export class AppComponent {
       0,
       0,
       width,
-      height
+      height,
     );
-  
+
     tempCanvas.toBlob((blob: Blob | null) => {
       if (blob) {
+        const formData = new FormData();
+        formData.append('file', blob, 'recorte_da_imagem.png');
+        console.log(formData)
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
         link.download = 'recorte_da_imagem.png';
         link.click();
         URL.revokeObjectURL(url);
-  
+        console.log(formData)
+
         const savedSelection = {
           url: url,
           link: tempCanvas.toDataURL(),
           width: width,
           height: height,
         };
-  
+        
         this.savedSelections.push(savedSelection);
-  
-        tempCtx.clearRect(0, 0, width, height);
-  
+        
+        
         this.cdr.detectChanges();
+        this.http.post('http://172.18.1.27:5001/predict', formData).subscribe(
+          (response) => {
+            console.log('Imagem recortada enviada com sucesso:', response);
+            // Faça qualquer outra ação necessária após enviar a imagem para a API
+          },
+          (error) => {
+            console.error('Erro ao enviar imagem recortada para a API:', error);
+            console.log(formData)
+            console.log(blob)
+            // Lide com o erro de envio da imagem para a API
+          },
+          );
+          tempCtx.clearRect(0, 0, width, height);
       }
     }, 'image/png');
   }
-
 }
