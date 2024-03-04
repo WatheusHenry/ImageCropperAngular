@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-root',
@@ -9,10 +11,14 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
   imports: [CommonModule],
 })
 export class AppComponent {
+
+  constructor(private cdr: ChangeDetectorRef) { }
+
+
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   private image!: HTMLImageElement;
-  private selection: { x: number; y: number; width: number; height: number } = {
+  selection: { x: number; y: number; width: number; height: number } = {
     x: 0,
     y: 0,
     width: 0,
@@ -21,9 +27,10 @@ export class AppComponent {
   private isDragging: boolean = false;
   private startX: number = 0;
   private startY: number = 0;
-  private maxCanvasWidth: number = 800;
-  private maxCanvasHeight: number = 600;
-  savedSelections: string[] = [];
+  private maxCanvasWidth: number = 1000;
+  private maxCanvasHeight: number = 800;
+  savedSelections: any[] = [];
+  
 
   ngAfterViewInit() {
     const canvasElement: HTMLCanvasElement = this.canvas.nativeElement;
@@ -55,10 +62,16 @@ export class AppComponent {
       const aspectRatio = this.image.width / this.image.height;
       if (aspectRatio > this.maxCanvasWidth / this.maxCanvasHeight) {
         this.canvas.nativeElement.width = this.maxCanvasWidth;
-        this.canvas.nativeElement.height = this.maxCanvasWidth / aspectRatio;
+        this.canvas.nativeElement.height = Math.max(
+          1,
+          this.maxCanvasWidth / aspectRatio
+        );
       } else {
         this.canvas.nativeElement.height = this.maxCanvasHeight;
-        this.canvas.nativeElement.width = this.maxCanvasHeight * aspectRatio;
+        this.canvas.nativeElement.width = Math.max(
+          1,
+          this.maxCanvasHeight * aspectRatio
+        );
       }
     }
   }
@@ -116,7 +129,7 @@ export class AppComponent {
       this.canvas.nativeElement.width,
       this.canvas.nativeElement.height,
     );
-    this.ctx.strokeStyle = 'gray';
+    this.ctx.strokeStyle = "#00ABEB";
     this.ctx.lineWidth = 2;
     this.ctx.strokeRect(
       this.selection.x,
@@ -124,6 +137,8 @@ export class AppComponent {
       this.selection.width,
       this.selection.height,
     );
+    this.ctx.setLineDash([4, 2]);
+
   }
 
   addSavedSelection(url: string) {
@@ -135,22 +150,27 @@ export class AppComponent {
   saveSelection() {
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d')!;
-
-    tempCanvas.width = this.selection.width;
-    tempCanvas.height = this.selection.height;
-
+  
+    const x = Math.min(this.startX, this.startX + this.selection.width);
+    const y = Math.min(this.startY, this.startY + this.selection.height);
+    const width = Math.abs(this.selection.width);
+    const height = Math.abs(this.selection.height);
+  
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+  
     tempCtx.drawImage(
       this.canvas.nativeElement,
-      this.selection.x,
-      this.selection.y,
-      this.selection.width,
-      this.selection.height,
+      x,
+      y,
+      width,
+      height,
       0,
       0,
-      this.selection.width,
-      this.selection.height,
+      width,
+      height
     );
-
+  
     tempCanvas.toBlob((blob: Blob | null) => {
       if (blob) {
         const url = URL.createObjectURL(blob);
@@ -159,13 +179,22 @@ export class AppComponent {
         link.download = 'recorte_da_imagem.png';
         link.click();
         URL.revokeObjectURL(url);
-
-        this.addSavedSelection(url);
+  
+        const savedSelection = {
+          url: url,
+          link: tempCanvas.toDataURL(),
+          width: width,
+          height: height,
+        };
+  
+        this.savedSelections.push(savedSelection);
         console.log(this.savedSelections);
-        this.addSavedSelection(tempCanvas.toDataURL());
-
-        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+  
+        tempCtx.clearRect(0, 0, width, height);
+  
+        this.cdr.detectChanges();
       }
     }, 'image/png');
   }
+
 }

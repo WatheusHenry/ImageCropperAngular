@@ -3,73 +3,70 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 70vw;
+  width: 90vw;
   margin: auto;
   padding: 1rem;
 }
 
-.button{
-  margin-top: 5rem;
-  align-self: flex-end; 
+.button {
+  margin-top: 2.5rem;
+  align-self: flex-end;
 }
 
-.recortButton{
-  padding: 0.7rem;
+.recortButton {
+  padding: 0.7rem 0.8rem;
   background: rgb(57, 89, 204);
   color: white;
-  font-weight: 700;
-  border-radius: 0.5rem;
+  font-weight: 400;
+  border-radius: 0.3rem;
   border: none;
   margin-bottom: 5rem;
 }
-.recortButton:hover{
+.recortButton:hover {
   background: rgb(41, 74, 195);
   cursor: pointer;
-  
 }
 
-
-
-.canvas-container{
+.canvas-container {
   padding: 2rem;
-  background-color: #fbfbfb;
-  border: 2px solid #e9e9e9 ;
-  border-radius: 1rem;
+  background-color: #ffffff;
+  border: 2px solid #e9e9e9;
+  border-radius: 0.5rem;
   margin: 2rem;
 }
 
 canvas {
   width: 100%;
   height: 100%;
- display: flex;
- justify-content: center ;
+  display: flex;
+  justify-content: center;
 }
 
 .saved-selections {
-  width: 80rem;
-  margin-top: 20px; 
+  width: 100rem;
+  margin: 3rem 3rem;
   padding: 2rem;
-  background: #efefef;
-  border-radius: 1rem;
+  background: #f6f6f6;
+  border-radius: 0.5rem;
 }
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 4fr)); 
+  grid-template-columns: repeat(auto-fill, minmax(300px, 4fr));
   grid-gap: 1rem;
 }
 
 .grid-item {
   width: 100%;
-  text-align: center; 
+  text-align: center;
 }
 
 .grid-item img {
   padding: 1rem;
   background-color: #fbfbfb;
-  border: 2px solid #e9e9e9 ;
+  border: 2px solid #e9e9e9;
   border-radius: 1rem;
-  max-width: 100%; 
+  max-width: 100%;
   height: auto;
-  margin: 1rem;
+  margin: 0.5rem;
 }
