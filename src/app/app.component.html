@@ -1,0 +1,29 @@
+<div class="container">
+
+  <div style="display: flex">
+    <div class="canvas-container">
+      <canvas
+        #canvas
+        (mousedown)="onMouseDown($event)"
+        (mousemove)="onMouseMove($event)"
+        (mouseup)="onMouseUp($event)"
+      ></canvas>
+    </div>
+    <div style="display: flex;flex-direction: column;gap:2rem">
+      <input class="button" type="file" (change)="onFileSelected($event)" />
+      <button class="recortButton" (click)="saveSelection()">
+        Salvar Recorte
+      </button>
+    </div>
+  </div>
+
+
+  <h2>Imagens Recortadas: </h2>
+  <div class="saved-selections">
+    <div class="grid-container">
+      <div class="grid-item" *ngFor="let selection of savedSelections">
+        <img [src]="selection" alt="" />
+      </div>
+    </div>
+  </div>
+</div>
