@@ -10,7 +10,10 @@
 
 .button {
   margin-top: 2.5rem;
-  align-self: flex-end;
+  margin-right: 2.5rem;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .recortButton {
@@ -44,7 +47,7 @@ canvas {
 
 .saved-selections {
   width: 100rem;
-  margin: 3rem 3rem;
+  margin: 0rem 3rem;
   padding: 2rem;
   background: #f6f6f6;
   border-radius: 0.5rem;

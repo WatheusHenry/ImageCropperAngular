@@ -27,8 +27,8 @@ export class AppComponent {
   private isDragging: boolean = false;
   private startX: number = 0;
   private startY: number = 0;
-  private maxCanvasWidth: number = 1000;
-  private maxCanvasHeight: number = 800;
+  private maxCanvasWidth: number = 1200;
+  private maxCanvasHeight: number = 1000;
   savedSelections: any[] = [];
   
 
@@ -188,7 +188,6 @@ export class AppComponent {
         };
   
         this.savedSelections.push(savedSelection);
-        console.log(this.savedSelections);
   
         tempCtx.clearRect(0, 0, width, height);
   
