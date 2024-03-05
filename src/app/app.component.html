@@ -1,6 +1,12 @@
 <div class="container">
 
   <input class="button" type="file" (change)="onFileSelected($event)" />
+  <label class="labelSwitch" for="">Travar Seleção</label>
+  <label class="switch">
+    <input (change)="toggleFixedCropArea()" type="checkbox">
+    <span class="slider round"></span>
+  </label>
+
   <div style="display: flex">
     <div class="canvas-container">
       <canvas
@@ -22,8 +28,14 @@
   <div class="saved-selections">
     <div class="grid-container">
       <div class="grid-item" *ngFor="let selection of savedSelections">
-        <img [src]="selection.link" alt="" />
+        <img [src]="selection.link" alt="ds" />
         <p>Tamanho do Recorte: {{ selection.width }} x {{ selection.height }}</p>
+        <p>Dados da API:</p>
+      <ul>
+        <li *ngFor="let data of selection.apiData">
+          Classe: {{ data.classe }}, Probabilidade: {{ data.probabilidade }}
+        </li>
+      </ul>
       </div>
     </div>
   </div>
